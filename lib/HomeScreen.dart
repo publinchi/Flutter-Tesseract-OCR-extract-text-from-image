@@ -14,6 +14,13 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _scanning = false;
   String _extractText = '';
   File _pickedImage;
+  final picker = ImagePicker();
+
+  Future getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    _extractText = await TesseractOcr.extractText(pickedFile.path);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,22 +33,22 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           _pickedImage == null
               ? Container(
-                  height: 300,
-                  color: Colors.grey[300],
-                  child: Icon(
-                    Icons.image,
-                    size: 100,
-                  ),
-                )
+            height: 300,
+            color: Colors.grey[300],
+            child: Icon(
+              Icons.image,
+              size: 100,
+            ),
+          )
               : Container(
-                  height: 300,
-                  decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      image: DecorationImage(
-                        image: FileImage(_pickedImage),
-                        fit: BoxFit.fill,
-                      )),
-                ),
+            height: 300,
+            decoration: BoxDecoration(
+                color: Colors.grey[300],
+                image: DecorationImage(
+                  image: FileImage(null),
+                  fit: BoxFit.fill,
+                )),
+          ),
           Container(
             height: 50,
             margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
@@ -57,10 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 setState(() {
                   _scanning = true;
                 });
-                _pickedImage =
-                    await ImagePicker.pickImage(source: ImageSource.gallery);
-                _extractText =
-                    await TesseractOcr.extractText(_pickedImage.path);
+                await getImage();
                 setState(() {
                   _scanning = false;
                 });
@@ -71,10 +75,10 @@ class _HomeScreenState extends State<HomeScreen> {
           _scanning
               ? Center(child: CircularProgressIndicator())
               : Icon(
-                  Icons.done,
-                  size: 40,
-                  color: Colors.green,
-                ),
+            Icons.done,
+            size: 40,
+            color: Colors.green,
+          ),
           SizedBox(height: 20),
           Center(
             child: Text(
